@@ -1,0 +1,13 @@
+METEO 11 — ARCHIVE COMPLÈTE POUR GITHUB  (APK Android)
+=======================================================
+1) Sur github.com : New repository (nom : meteo11, privé conseillé) → Create.
+2) Décompresser cette archive. Envoyer TOUT le contenu à la racine du dépôt
+   (Add file → Upload files → glisser les fichiers ET les dossiers).
+   ATTENTION : le dossier caché « .github » doit être envoyé aussi.
+   S'il n'apparaît pas (téléphone) : Add file → Create new file → écrire exactement
+       .github/workflows/build-apk.yml
+   et coller le contenu du fichier build-apk.yml fourni à part.
+3) Onglet Actions → « Build APK » → Run workflow (il démarre aussi seul après l'envoi).
+4) Après 6-10 min (pastille verte) : ouvrir l'exécution → Artifacts → METEO11-apk → télécharger
+   → décompresser → METEO11.apk → l'installer sur le téléphone (autoriser « sources inconnues »).
+Si le build échoue : ouvrir l'étape en rouge dans Actions et m'envoyer le texte de l'erreur.

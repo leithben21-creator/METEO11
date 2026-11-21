@@ -1,0 +1,7 @@
+{
+  "appId": "dz.artillerie.meteo11",
+  "appName": "MÉTÉO 11",
+  "webDir": "www",
+  "backgroundColor": "#0b1226",
+  "android": { "allowMixedContent": false }
+}

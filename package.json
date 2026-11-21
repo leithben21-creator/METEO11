@@ -1,0 +1,19 @@
+{
+  "name": "meteo11",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MÉTÉO 11 — corrections météorologiques pour l'artillerie (D-30 / 2C1 / 2C3) — CDT BENACER WALID",
+  "scripts": {
+    "android:add": "cap add android",
+    "android:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/app": "^6.0.2",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/share": "^6.0.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0"
+  }
+}

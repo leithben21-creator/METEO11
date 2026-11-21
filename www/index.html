@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0b1226">
+<title>MÉTÉO 11</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="wx" aria-hidden="true"></canvas>
+
+<header id="top">
+  <div class="brand">
+    <img src="img/logo.png" alt="" class="logo" id="logo">
+    <div class="titles"><h1>MÉTÉO 11</h1><p>نشرة جوية متوسطة<br>للمدفعية</p></div>
+  </div>
+  <div class="tools">
+    <button class="icon-btn" id="btnFx" aria-label="الحركة">✨</button>
+    <button class="icon-btn" id="btnInfo" aria-label="معلومات">ⓘ</button>
+    <div class="chip" id="chip">☀️ صافٍ</div>
+  </div>
+</header>
+
+<main id="pages">
+  <!-- ═════════ المولّد ═════════ -->
+  <section class="page active" id="p-gen">
+    <div class="hero" id="hero"><div class="big" id="heroT">25°</div><div class="desc"><b id="heroL">صافٍ</b><span id="heroS"></span></div></div>
+    <div class="seg" id="seg"><button data-mode="dmk" class="on">DMK — الطريقة الرسمية</button><button data-mode="model">نموذج تدريبي</button></div>
+    <p class="hint seghint" id="modeHint"></p>
+    <div class="card">
+      <h2>◉ بيانات المحطة</h2>
+      <div class="grid2">
+        <label>رقم المحطة NN<input id="nn" inputmode="numeric" dir="ltr"></label>
+        <label>الارتفاع hhhh (م)<input id="alt" inputmode="decimal" dir="ltr"></label>
+      </div>
+    </div>
+    <div class="card">
+      <h2>◉ القياسات الأرضية</h2>
+      <div class="grid3">
+        <label>الحرارة T (°م)<input id="T" inputmode="decimal" dir="ltr"></label>
+        <label>الضغط P (ملم)<input id="P" inputmode="decimal" dir="ltr"></label>
+        <label class="m-model">الرطوبة RH (%)<input id="RH" inputmode="decimal" dir="ltr"></label>
+        <label class="m-dmk">تصحيح البارومتر ΔH (ملم)<input id="dH" inputmode="decimal" dir="ltr"></label>
+      </div>
+    </div>
+    <div class="card">
+      <h2>◉ معطيات الريح</h2>
+      <div class="grid2">
+        <label><span class="m-dmk">αw0 اتجاه الريح الأرضي</span><span class="m-model">الاتجاه GG</span> (مليام 0–6000)<input id="wdir" inputmode="decimal" dir="ltr"></label>
+        <label><span class="m-dmk">W0 سرعة الريح الأرضي</span><span class="m-model">السرعة WW</span> (م/ث)<input id="wspd" inputmode="decimal" dir="ltr"></label>
+      </div>
+    </div>
+    <div class="card m-model">
+      <h2>◉ معاملات النموذج</h2>
+      <div class="grid2">
+        <label>غطاء السحب (0–1)<input id="cloud" inputmode="decimal" dir="ltr"></label>
+        <label>الساعة UTC<input id="hour" inputmode="numeric" dir="ltr"></label>
+      </div>
+      <label class="wide">نوع التضاريس<select id="z0"></select></label>
+    </div>
+    <button class="btn gold" id="btnGen">▶ توليد النشرة ◀</button>
+    <div class="row2">
+      <button class="btn ghost" id="btnSaveGen">💾 حفظ / مشاركة</button>
+      <button class="btn ghost" id="btnClearGen">✕ مسح</button>
+    </div>
+    <p class="engine"><i></i> ENGINE ONLINE — يعمل دون اتصال</p>
+  </section>
+
+  <!-- ═════════ النشرة ═════════ -->
+  <section class="page" id="p-bul">
+    <div class="card">
+      <h2>◉ النشرة الجوية</h2>
+      <textarea id="bulText" dir="ltr" spellcheck="false" placeholder="الصق نشرة Météo 11 هنا أو افتح ملف TXT&#10;Météo1107 – 171900 – 0150 – 50556 – 0020 – 02 – 544812 – ..."></textarea>
+      <div class="row3">
+        <button class="btn ghost" id="btnOpen">📂 فتح TXT</button>
+        <button class="btn gold sm" id="btnRead">✔ قراءة</button>
+        <button class="btn ghost" id="btnClearBul">✕ مسح</button>
+      </div>
+      <button class="btn ghost wide" id="btnShare">📤 مشاركة / نسخ</button>
+      <input type="file" id="file" accept=".txt,text/plain" hidden>
+      <div class="status" id="bulStatus"></div>
+    </div>
+    <div class="card" id="dmkCard" hidden>
+      <h2>◉ بطاقة حساب DMK</h2>
+      <div id="dmkSheet"></div>
+    </div>
+    <div class="card" id="layersCard" hidden>
+      <h2>◉ الطبقات</h2>
+      <div class="tbl-wrap"><table class="layers" id="layers"></table></div>
+    </div>
+    <div class="card" id="chartsCard" hidden>
+      <h2>◉ مقطع الحرارة (Δt مقابل الارتفاع)</h2>
+      <canvas id="chT" class="chart"></canvas>
+      <h2>◉ مقطع الريح (السرعة مقابل الارتفاع)</h2>
+      <canvas id="chW" class="chart"></canvas>
+      <h2>◉ مخطط الريح القطبي</h2>
+      <canvas id="chP" class="chart sq"></canvas>
+    </div>
+  </section>
+
+  <!-- ═════════ التصحيحات ═════════ -->
+  <section class="page" id="p-corr">
+    <div class="card">
+      <h2>◉ بيانات الرمي</h2>
+      <div class="status" id="corrBul"></div>
+      <div class="guns" id="guns">
+        <button data-gun="2C3"><img src="img/2C3.webp" alt=""><span>2C3</span></button>
+        <button data-gun="2C1"><img src="img/2C1.webp" alt=""><span>2C1</span></button>
+        <button data-gun="D-30" class="on"><img src="img/D30.webp" alt=""><span>D-30</span></button>
+      </div>
+      <div class="grid2">
+        <label>الحشوة<select id="charge"></select></label>
+        <label>المدى (م)<input id="range" inputmode="decimal" dir="ltr"></label>
+      </div>
+      <div class="hint" id="rangeHint"></div>
+      <div class="grid2">
+        <label>اتجاه الرمي (مليام 0–6000)<input id="az" inputmode="decimal" dir="ltr"></label>
+        <label>اختيار الطبقة<select id="method"></select></label>
+      </div>
+      <details class="more">
+        <summary>تصحيحات إضافية (اختيارية)</summary>
+        <div class="grid3">
+          <label>Δ حرارة الشحنة (°م)<input id="dTch" inputmode="decimal" dir="ltr" value="0"></label>
+          <label>إشارات الوزن (±)<input id="nq" inputmode="decimal" dir="ltr" value="0"></label>
+          <label>Δ v0 (1/100)<input id="dV0" inputmode="decimal" dir="ltr" value="0"></label>
+        </div>
+        <p class="hint">تستعمل أعمدة DeltaXTch وDeltaXq وDeltaXvo من جدول الرمي. الوحدات حسب الجدول (حرارة لكل 10°م، وزن لكل إشارة، v0 لكل 1/100) — راجعها مع الكتاب.</p>
+      </details>
+    </div>
+    <button class="btn gold" id="btnCorr">◀ احسب التصحيحات ▶</button>
+  </section>
+
+  <!-- ═════════ الجداول ═════════ -->
+  <section class="page" id="p-tab">
+    <div class="card">
+      <h2>◉ مراجعة جداول الرمي</h2>
+      <div class="grid2">
+        <label>المدفع<select id="tGun"></select></label>
+        <label>الحشوة<select id="tCharge"></select></label>
+      </div>
+      <p class="hint">السطور المشبوهة (Hausse أو Ys أو Ybul تنقص مع زيادة المدى) بالأحمر — قارنها بالكتاب.</p>
+      <div class="status" id="tInfo"></div>
+      <div class="tbl-wrap tall" id="dataWrap"><table class="data" id="dataTbl"></table></div>
+      <div id="dmkTbls" hidden></div>
+    </div>
+  </section>
+</main>
+
+<nav id="nav">
+  <button data-tab="gen" class="on"><b>⚙️</b><span>المولّد</span></button>
+  <button data-tab="bul"><b>📄</b><span>النشرة</span></button>
+  <button data-tab="corr"><b>🎯</b><span>التصحيحات</span></button>
+  <button data-tab="tab"><b>📊</b><span>الجداول</span></button>
+</nav>
+
+<div id="toast"></div>
+<div id="scrim" hidden></div>
+<aside id="sheet" hidden>
+  <div class="sheet-bar"><button class="x" id="sheetClose">✕</button><h3 id="sheetTitle"></h3></div>
+  <div id="sheetBody"></div>
+</aside>
+
+<script src="js/dmk-data.js"></script>
+<script src="js/meteo.js"></script>
+<script src="js/weather.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
